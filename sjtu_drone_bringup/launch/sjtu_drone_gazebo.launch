@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- Define robot_description by running xacro -->
+  <let name="robot_description"
+       value="$(command '$(find-exec xacro) $(find-pkg-share sjtu_drone_description)/urdf/sjtu_drone.urdf.xacro use_ros2_control:=true sim_mode:=true')"/>
+
+  <!-- Robot State Publisher -->
+  <node pkg="robot_state_publisher" exec="robot_state_publisher" output="screen">
+    <param name="use_sim_time" value="true"/>
+    <param name="robot_description" value="$(var robot_description)"/>
+  </node>
+
+  <!-- Gazebo with parameters -->
+  <include file="$(find-pkg-share gazebo_ros)/launch/gazebo.launch.py"/>
+
+  <!-- Spawn Drone -->
+  <node pkg="sjtu_drone_bringup" exec="spawn_drone" output="screen"
+        args="$(command 'xacro $(find-pkg-share sjtu_drone_description)/urdf/sjtu_drone.urdf.xacro') drone"/>
+  
+  <node pkg="joint_state_publisher" exec="joint_state_publisher" output="screen"/>
+  
+</launch>
